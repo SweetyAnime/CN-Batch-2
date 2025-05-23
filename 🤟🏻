@@ -1,0 +1,50 @@
+AIM:
+To implement a UDP Echo Client and Server in Python, where the client sends a message and verifies if the echoed response from the server is the same. Also, simulate the performance improvement similar to shutdown() by closing the socket properly.
+
+ALGORITHM:
+1.Client:
+
+1. Create a UDP socket.
+2. Input a message and send to server.
+3. Receive the echoed message.
+4. Compare with sent message and display result.
+5. Close the socket.
+
+2.Server:
+
+1. Create a UDP socket and bind to a port.
+2. Receive data from client.
+3. Echo the same data back.
+4. Close the socket after communication.
+
+PROGRAM:(PYTHON)
+1.Client:
+import socket
+
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+msg = input("Msg: ")
+s.sendto(msg.encode(), ("127.0.0.1", 8080))
+data, _ = s.recvfrom(1024)
+print("Echo:", data.decode())
+print("Match" if msg == data.decode() else "Mismatch")
+s.close()
+
+2.Server:
+import socket
+
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.bind(("0.0.0.0", 8080))
+data, addr = s.recvfrom(1024)
+s.sendto(data, addr)
+s.close()
+
+SAMPLE OUTPUT:
+Client:
+Msg: Hello Python
+Echo: Hello Python
+Match
+
+RESULT:
+The UDP Echo Client and Server in Python were successfully implemented. The client verified the echoed message. Socket communication was properly handled and closed.
+
+
