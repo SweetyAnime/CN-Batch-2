@@ -1,0 +1,85 @@
+AIM:
+To write a UDP client-server program in C where:
+1.The client sends "hello server" to the server.
+2.The server replies with "hello client".
+Both programs are designed to run on different systems connected via a network.
+
+ALGORITHM:
+1.Client:
+1. Create a UDP socket.
+2. Define the server's IP and port.
+3. Send the message "hello server" to the server.
+4. Receive and display the reply from the server.
+
+2.Server:
+1. Create a UDP socket.
+2. Bind to a local port.
+3. Wait for message from the client.
+4. If message is "hello server", reply with "hello client".
+
+PROGRAM:
+1.SERVER:
+
+#include <stdio.h>
+#include <string.h>
+#include <netinet/in.h>
+
+int main() {
+    int s;
+    char buffer[100];
+    struct sockaddr_in serv, cli;
+    socklen_t len = sizeof(cli);
+
+    s = socket(AF_INET, SOCK_DGRAM, 0);
+    serv.sin_family = AF_INET;
+    serv.sin_port = htons(8080);
+    serv.sin_addr.s_addr = INADDR_ANY;
+
+    bind(s, (struct sockaddr*)&serv, sizeof(serv));
+    recvfrom(s, buffer, sizeof(buffer), 0, (struct sockaddr*)&cli, &len);
+
+    printf("Client says: %s\n", buffer);
+
+    if (strcmp(buffer, "hello server") == 0) {
+        strcpy(buffer, "hello client");
+        sendto(s, buffer, sizeof(buffer), 0, (struct sockaddr*)&cli, len);
+    }
+}
+
+
+2. CLIENT:
+
+#include <stdio.h>
+#include <string.h>
+#include <netinet/in.h>
+
+int main() {
+    int s;
+    char msg[] = "hello server", reply[100];
+    struct sockaddr_in serv;
+    socklen_t len = sizeof(serv);
+
+    s = socket(AF_INET, SOCK_DGRAM, 0);
+    serv.sin_family = AF_INET;
+    serv.sin_port = htons(8080);
+    serv.sin_addr.s_addr = inet_addr("SERVER_IP"); // Replace with actual IP
+
+    sendto(s, msg, sizeof(msg), 0, (struct sockaddr*)&serv, len);
+    recvfrom(s, reply, sizeof(reply), 0, NULL, NULL);
+
+    printf("Server says: %s\n", reply);
+}
+
+
+SAMPLE OUTPUT:
+1.Client:
+$ ./client
+Server says: hello client
+
+2.Server:
+$ ./server
+Client says: hello server
+
+RESULT:
+The UDP client-server program successfully exchanged hello messages over the network between two computers.
+
