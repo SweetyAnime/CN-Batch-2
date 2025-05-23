@@ -1,0 +1,71 @@
+AIM:
+To implement UDP-based client-server communication in Python, where:
+1.The client sends a C program file
+2.The server compiles and executes it and sends the output or error back to the client.
+
+ALGORITHM:
+1.Client:
+1. Open and read a C program file.
+2. Send file content to server using UDP.
+3. Receive and display the output/error from server.
+
+2.Server:
+1. Receive C file content from client via UDP.
+2. Save the file as recv.c.
+3. Compile using gcc, redirect errors.
+4. If successful, execute it and capture output.
+5. Send back output or error message to client.
+
+PROGRAMS:
+1.Client:
+import socket
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+server = ("127.0.0.1", 9999)
+
+with open("code.c", "r") as f:
+    data = f.read()
+
+sock.sendto(data.encode(), server)
+result, _ = sock.recvfrom(4096)
+print("Server response:\n", result.decode())
+
+2.Server:
+import socket
+import subprocess
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.bind(("0.0.0.0", 9999))
+
+data, addr = sock.recvfrom(4096)
+with open("recv.c", "w") as f:
+    f.write(data.decode())
+
+# Try to compile
+compile_proc = subprocess.run(["gcc", "recv.c", "-o", "a.out"], stderr=subprocess.PIPE)
+if compile_proc.returncode != 0:
+    sock.sendto(compile_proc.stderr, addr)
+else:
+    exec_proc = subprocess.run(["./a.out"], capture_output=True, text=True)
+    sock.sendto(exec_proc.stdout.encode(), addr)
+
+3. Test File:(save it as code.c)
+#include <stdio.h>
+int main() {
+    printf("Hello from Python UDP server!\n");
+    return 0;
+}
+
+
+SAMPLE OUTPUT:
+1.if success:
+Server response:
+Hello from Python UDP server!
+
+2.if fails:
+Server response:
+recv.c: In function ‘main’:
+recv.c:3:5: error: expected ‘;’ before ‘return’
+
+RESULT:
+The client and server Python programs successfully implement UDP communication for C file transfer, compilation, execution, and output/error exchange.
