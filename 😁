@@ -1,0 +1,76 @@
+AIM:
+To write a TCP client-server program where the client sends a filename and the server returns the file content if it exists.
+
+ALGORITHM:
+Server:
+1. Create a TCP socket.
+2. Bind it to a port and listen for connections.
+3. Accept the client connection.
+4. Receive filename from the client.
+5. Open and read the file.
+6. Send the file content or error message.
+7. Close connection.
+
+Client:
+1. Create a TCP socket and connect to the server.
+2. Send the filename.
+3. Receive and display file content.
+4. Close connection.
+
+PROGRAM:
+1. Server (file_server.py):
+
+import socket
+
+server = socket.socket()
+server.bind(('0.0.0.0', 8080))
+server.listen(1)
+print("Server listening...")
+
+conn, addr = server.accept()
+print("Connected by", addr)
+
+filename = conn.recv(1024).decode()
+try:
+    with open(filename, 'r') as file:
+        content = file.read()
+        conn.send(content.encode())
+except FileNotFoundError:
+    conn.send(b"File not found.")
+
+conn.close()
+server.close()
+
+
+---
+
+2.Client (file_client.py):
+
+import socket
+
+client = socket.socket()
+client.connect(('127.0.0.1', 8080))
+
+filename = input("Enter filename to request: ")
+client.send(filename.encode())
+
+data = client.recv(10240).decode()
+print("\nReceived content:\n", data)
+
+client.close()
+
+-----
+
+OUTPUT:
+Client Terminal:
+Enter filename to request: demo.txt
+
+Received content:
+This is a demo file content.
+
+Server Terminal:
+Server listening...
+Connected by ('127.0.0.1', 51324)
+
+RESULT:
+The TCP client-server program successfully transferred file content upon request, fulfilling the practical objective.
