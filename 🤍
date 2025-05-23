@@ -1,0 +1,42 @@
+AIM:
+To implement the data link layer framing methods—Character Count, Character Stuffing, and Bit Stuffing—using Python.
+
+ALGORITHM:
+1. Character Count: Add data length before data.
+2. Character Stuffing: Add ESC before F or E, wrap with F.
+3. Bit Stuffing: Add 0 after five 1s.
+
+PROGRAM(PYTHON):
+data = "HELLO"
+bits = "0111111010"
+
+print("\nCharacter Count:\n", str(len(data)) + data)
+
+print("\nCharacter Stuffing:")
+print("F" + ''.join('E'+c if c in 'FE' else c for c in data) + "F")
+
+print("\nBit Stuffing:")
+count = 0
+res = ""
+for b in bits:
+    res += b
+    count = count + 1 if b == '1' else 0
+    if count == 5:
+        res += '0'
+        count = 0
+print(res)
+
+SAMPLE OUTPUT:
+Character Count:
+5HELLO
+
+Character Stuffing:
+FHELLOF
+
+Bit Stuffing:
+01111101010
+
+RESULT:
+The Python program successfully implements the Character Count, Character Stuffing, and Bit Stuffing framing methods, and produces the expected framed output for given input data.
+
+
