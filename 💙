@@ -1,1 +1,74 @@
+AIM:
+To write a program using datagram sockets in C where the server sends messages, and the client displays them using UDP.
 
+ALGORITHM:
+1.Server:
+1. Create a UDP socket.
+2. Set up server and client address structures.
+3. Read a message from the user.
+4. Send the message to the client using sendto().
+
+2.Client:
+1. Create a UDP socket.
+2. Bind it to a port.
+3. Receive a message from the server using recvfrom().
+4. Display the received message.
+
+PROGRAMS:
+1.Server:
+
+#include <stdio.h>
+#include <string.h>
+#include <netinet/in.h>
+int main() {
+    int s; char msg[100];
+    struct sockaddr_in serv, cli;
+    socklen_t len = sizeof(cli);
+
+    s = socket(AF_INET, SOCK_DGRAM, 0);
+    serv.sin_family = AF_INET;
+    serv.sin_port = htons(8080);
+    serv.sin_addr.s_addr = INADDR_ANY;
+
+    printf("Enter message to send: ");
+    scanf("%s", msg);
+
+    cli.sin_family = AF_INET;
+    cli.sin_port = htons(9090);
+    cli.sin_addr.s_addr = INADDR_ANY;
+
+    sendto(s, msg, sizeof(msg), 0, (struct sockaddr*)&cli, sizeof(cli));
+    printf("Message sent to client.\n");
+}
+
+2. Client:
+#include <stdio.h>
+#include <netinet/in.h>
+int main() {
+    int s; char msg[100];
+    struct sockaddr_in cli;
+    socklen_t len = sizeof(cli);
+
+    s = socket(AF_INET, SOCK_DGRAM, 0);
+    cli.sin_family = AF_INET;
+    cli.sin_port = htons(9090);
+    cli.sin_addr.s_addr = INADDR_ANY;
+
+    bind(s, (struct sockaddr*)&cli, sizeof(cli));
+    recvfrom(s, msg, sizeof(msg), 0, NULL, NULL);
+    printf("Message from server: %s\n", msg);
+}
+
+
+SAMPLE OUTPUT:
+1.Server:
+$ ./server
+Enter message to send: hello
+Message sent to client.
+
+2.Client:
+$ ./client
+Message from server: hello
+
+RESULT:
+The datagram socket program was successfully executed. The message typed at the server side was received and displayed at the client side.
